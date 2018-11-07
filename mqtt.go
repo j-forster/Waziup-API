@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/j-forster/Waziup-API/mqtt"
+	"github.com/j-forster/Waziup-API/tools"
 )
 
 var mqttHandler = &MQTTHandler{}
@@ -95,7 +96,7 @@ func (h *MQTTHandler) Publish(conn *mqtt.Connection, msg *mqtt.Message) error {
 	if conn != nil {
 		log.Printf("[MQTT ] (%s) Published \"%s\" [%d].\n", conn.ClientID, msg.Topic, len(msg.Buf))
 
-		body := ClosingBuffer{bytes.NewBuffer(msg.Buf)}
+		body := tools.ClosingBuffer{bytes.NewBuffer(msg.Buf)}
 		rurl, _ := url.Parse(msg.Topic)
 		req := http.Request{
 			Method: "PUBLISH",

@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/j-forster/Waziup-API/mqtt"
+	"github.com/j-forster/Waziup-API/tools"
 )
 
 func main() {
@@ -70,14 +71,6 @@ func (resp *ResponseWriter) WriteHeader(statusCode int) {
 	resp.ResponseWriter.WriteHeader(statusCode)
 }
 
-type ClosingBuffer struct {
-	*bytes.Buffer
-}
-
-func (cb *ClosingBuffer) Close() error {
-	return nil
-}
-
 ////////////////////
 
 func Serve(resp http.ResponseWriter, req *http.Request) {
@@ -91,7 +84,7 @@ func Serve(resp http.ResponseWriter, req *http.Request) {
 			http.Error(resp, "400 Bad Request", http.StatusBadRequest)
 			return
 		}
-		req.Body = &ClosingBuffer{bytes.NewBuffer(body)}
+		req.Body = &tools.ClosingBuffer{bytes.NewBuffer(body)}
 	}
 
 	router.ServeHTTP(&wrapper, req)
@@ -103,7 +96,7 @@ func Serve(resp http.ResponseWriter, req *http.Request) {
 		req.Method,
 		req.RequestURI)
 
-	if cbuf, ok := req.Body.(*ClosingBuffer); ok {
+	if cbuf, ok := req.Body.(*tools.ClosingBuffer); ok {
 		log.Printf("[DEBUG] Body: %s\n", cbuf.Bytes())
 		msg := mqtt.Message{
 			QoS:   0,
